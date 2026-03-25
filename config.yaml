@@ -1,0 +1,19 @@
+gias:
+  download_url: "https://ea-edubase-api-prod.azurewebsites.net/edubase/downloads/public/edubasealldata{date}.csv"
+  cache_locally: true
+  cache_path: "./cache"
+
+scope:
+  include_closed: false       # include Closed establishments (default: false)
+  include_independent: true   # include independent schools (default: true)
+  include_nursery: true       # include nursery / early-years schools (default: true)
+  include_fe: true            # include further-education providers (default: true)
+
+liveness:
+  timeout_seconds: 4
+  max_redirects: 5
+  concurrency: 50
+  user_agent: "DfE-CyberPipeline/1.0"
+
+output:
+  path: "./output"

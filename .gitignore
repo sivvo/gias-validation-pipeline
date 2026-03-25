@@ -1,0 +1,19 @@
+# Virtual environment
+.venv/
+
+# Byte-compiled / optimised Python
+__pycache__/
+*.py[cod]
+
+# Pytest
+.pytest_cache/
+
+# Downloaded / generated data (not for VCS)
+cache/
+output/
+
+# Editor
+.vscode/
+.idea/
+*.swp
+.claude
