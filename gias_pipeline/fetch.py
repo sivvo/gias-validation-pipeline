@@ -1,4 +1,9 @@
-"""Download and cache the GIAS bulk data export CSV."""
+"""
+Download and cache the GIAS bulk data export CSV.
+This is based on a few assumptions:
+    file name format: edubasealldata_{d.strftime('%Y%m%d')}.csv
+    encoding type: windows-1252
+"""
 
 from __future__ import annotations
 

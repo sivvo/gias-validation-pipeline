@@ -6,7 +6,7 @@ Steps:
   2. filter        — keep open, in-scope schools
   3. extract       — classify URLs, build SchoolRecord list
   4. liveness      — async HTTP reachability check (--skip-liveness to omit)
-  5. enrich        — MAT join + email domain refinement
+  5. enrich        — email domain refinement
   6. delta         — compare to previous run
   7. output        — write all output files
 """
@@ -102,38 +102,33 @@ def main(config_path: str = "config.yaml", skip_liveness: bool = False) -> None:
 
     logger.info("Pipeline run started (run_id=%s)", run_id)
 
-    # --- Step 1: Fetch ---
-    logger.info("Step 1: Fetching GIAS data")
+    logger.info(f"Fetching GIAS data")
     df = fetch(config_path=config_path)
 
-    # Capture the GIAS file date from the cached filename if possible
-    gias_date = run_at.strftime("%Y%m%d")
+    gias_date = run_at.strftime("%Y%m%d")     # Capture the GIAS file date from the cached filename if possible
 
-    # --- Step 2: Filter ---
-    logger.info("Step 2: Filtering schools")
-    filter_result = filter_schools(df, scope=cfg.get("scope", {}))
+    logger.info(f"Applying Filters")
+    filter_result = filter_schools(df, scope=cfg.get("scope", {})) # apply filters - configured in config.yaml
 
-    # --- Step 3: Extract ---
-    logger.info("Step 3: Extracting URLs")
+    logger.info(f"Extracting URLs")
     records = extract(filter_result.active, data_dir=data_dir, run_id=run_id)
 
-    # --- Step 4: Liveness ---
+    # Liveness check - validate connectivity
     if skip_liveness:
-        logger.info("Step 4: Liveness check SKIPPED (--skip-liveness)")
+        logger.info(f"Liveness check SKIPPED (--skip-liveness)")
     else:
-        logger.info("Step 4: Running liveness checks")
+        logger.info(f"Running liveness checks")
         records = check_liveness(records, config_path=config_path)
 
-    # --- Step 5: Enrich ---
-    logger.info("Step 5: Refining email domains")
+    logger.info("Parse email domains")
     records = enrich(records)
 
-    # --- Step 6: Delta ---
-    logger.info("Step 6: Computing delta")
+    # Delta - what changed this run to last
+    # not currently used.. TODO remove this?
+    logger.info(f"Computing delta")
     delta = compute_delta(records, output_dir=output_dir)
 
-    # --- Step 7: Output ---
-    logger.info("Step 7: Writing output files to %s", output_dir)
+    logger.info(f"Writing output files to {output_dir}")
     runtime_seconds = time.monotonic() - wall_start
 
     run_summary = {
@@ -169,7 +164,6 @@ def _parse_args() -> argparse.Namespace:
         help="Skip HTTP liveness checks (faster re-runs during development)",
     )
     return parser.parse_args()
-
 
 if __name__ == "__main__":
     args = _parse_args()

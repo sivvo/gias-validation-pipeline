@@ -7,6 +7,13 @@ Scope is controlled by four boolean flags (all read from config.yaml's
   include_independent (default: true)  — include independent schools
   include_nursery     (default: true)  — include nursery / early-years schools
   include_fe          (default: true)  — include further-education providers
+
+  We may want to exclude types of records not relevant to our analysis, such as:
+    - Schools that have closed
+    - Independent schools
+    - Nursery schools
+    - Further education providers
+Because I wasn't sure at time of writing, i've made these all be config configurable
 """
 
 from __future__ import annotations

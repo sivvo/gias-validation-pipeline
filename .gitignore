@@ -16,3 +16,4 @@ output/
 .vscode/
 .idea/
 *.swp
+.claude
