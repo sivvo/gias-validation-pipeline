@@ -93,11 +93,6 @@ _SCOPE_DEFAULTS: dict = {
 _COL_TYPE = "TypeOfEstablishment (name)"
 _COL_STATUS = "EstablishmentStatus (name)"
 
-
-# ---------------------------------------------------------------------------
-# Internal helpers
-# ---------------------------------------------------------------------------
-
 def _build_type_set(scope: dict) -> frozenset[str]:
     types: set[str] = set(TYPES_MAINSTREAM)
     if scope.get("include_independent", _SCOPE_DEFAULTS["include_independent"]):
@@ -108,22 +103,15 @@ def _build_type_set(scope: dict) -> frozenset[str]:
         types |= TYPES_FE
     return frozenset(types)
 
-
 def _build_status_set(scope: dict) -> frozenset[str]:
     statuses: set[str] = {"Open"}
     if scope.get("include_closed", _SCOPE_DEFAULTS["include_closed"]):
         statuses.add("Closed")
     return frozenset(statuses)
 
-
-# ---------------------------------------------------------------------------
-# Public API
-# ---------------------------------------------------------------------------
-
 class FilterResult(NamedTuple):
     active: pd.DataFrame
     excluded: pd.DataFrame
-
 
 def filter_schools(df: pd.DataFrame, scope: dict | None = None) -> FilterResult:
     """Split *df* into in-scope establishments and everything else.

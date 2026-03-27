@@ -152,11 +152,6 @@ class TestEmailConfidence:
     def test_gov_uk_is_low(self):
         assert _email_confidence("la.gov.uk") == "low"
 
-
-# ---------------------------------------------------------------------------
-# Helper functions
-# ---------------------------------------------------------------------------
-
 class TestApexFromUrl:
     def test_strips_www(self):
         assert _apex_from_url("https://www.school.sch.uk") == "school.sch.uk"

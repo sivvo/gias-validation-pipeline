@@ -9,18 +9,16 @@ from __future__ import annotations
 
 import logging
 import os
-from datetime import date, timedelta
-from pathlib import Path
-
 import pandas as pd
 import requests
 import yaml
+from datetime import date, timedelta
+from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
 _ENCODING = "windows-1252"
 _CHUNK_SIZE = 1 << 20  # 1 MiB
-
 
 def _load_config(config_path: str = "config.yaml") -> dict:
     with open(config_path) as fh:
@@ -91,20 +89,19 @@ def fetch(config_path: str = "config.yaml") -> pd.DataFrame:
             break
         except requests.HTTPError as exc:
             if exc.response is not None and exc.response.status_code == 404:
-                logger.warning("File not yet published for %s, trying previous day", d)
+                logger.warning(f"File not yet published for {d}, trying previous day")
                 continue
             raise
 
     if csv_path is None:
         raise RuntimeError(
             "Could not download GIAS data for today or yesterday. "
-            "Check network connectivity or the GIAS download URL."
+            "Verify the GIAS download URL."
         )
 
     logger.info("Reading CSV %s (encoding=%s)", csv_path, _ENCODING)
     df = pd.read_csv(csv_path, encoding=_ENCODING, dtype=str, low_memory=False)
 
-    # Normalise column names: strip surrounding whitespace
     df.columns = [c.strip() for c in df.columns]
 
     logger.info("Loaded %d rows, %d columns", len(df), len(df.columns))

@@ -8,11 +8,12 @@ scope:
   include_independent: true   # include independent schools (default: true)
   include_nursery: true       # include nursery / early-years schools (default: true)
   include_fe: true            # include further-education providers (default: true)
+  #TODO validate which of these filters actually consistute what we mean when we say "schools"
 
 liveness:
-  timeout_seconds: 4
+  timeout_seconds: 4 # 4 seems to be the sweet spot to balance speed and reliability
   max_redirects: 5
-  concurrency: 50
+  concurrency: 50 # 100 and 75 resulted in far fewer successful requests - possibly because of slow shared servers on some hosts
   user_agent: "DfE-CyberPipeline/1.0"
 
 output:

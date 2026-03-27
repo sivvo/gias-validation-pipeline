@@ -13,15 +13,12 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from typing import Optional
-
 import aiohttp
 import yaml
-
+from typing import Optional
 from .models import SchoolRecord
 
 logger = logging.getLogger(__name__)
-
 
 def _load_liveness_config(config_path: str = "config.yaml") -> dict:
     with open(config_path) as fh:
@@ -115,8 +112,7 @@ async def _run_liveness(
         for record in records:
             if record.url_original:
                 tasks.append(_check_one(session, record, semaphore, max_redirects))
-
-        # Process with progress logging
+        
         batch_size = 1000
         for i in range(0, len(tasks), batch_size):
             batch = tasks[i : i + batch_size]

@@ -46,7 +46,6 @@ def _make_response(status: int, url: str, history=None) -> MagicMock:
     resp.__aexit__ = AsyncMock(return_value=False)
     return resp
 
-
 class TestCheckOne:
     def test_successful_get_marks_reachable(self):
         record = _make_record("100001", "https://example.sch.uk")

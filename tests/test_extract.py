@@ -41,11 +41,6 @@ def active_df(fixture_df) -> pd.DataFrame:
 def records(active_df) -> dict[str, SchoolRecord]:
     return {r.urn: r for r in extract(active_df, data_dir=DATA_DIR, run_id="test-run")}
 
-
-# ---------------------------------------------------------------------------
-# Unit tests — pure helpers
-# ---------------------------------------------------------------------------
-
 class TestParseUrl:
     def test_full_https_url(self):
         fqdn, apex, canonical = _parse_url("https://www.school.sch.uk")

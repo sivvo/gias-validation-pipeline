@@ -18,12 +18,10 @@ from __future__ import annotations
 
 import json
 import logging
+import pandas as pd
 from collections import Counter
 from pathlib import Path
 from typing import Optional
-
-import pandas as pd
-
 from .delta import DeltaResult
 from .models import SchoolRecord
 
@@ -51,7 +49,6 @@ _SCHOOLS_COLUMNS = [
 ]
 
 _MANUAL_FLAGS = frozenset({"domain_missing", "social_media_only", "parse_failed"})
-
 
 def _records_to_df(records: list[SchoolRecord]) -> pd.DataFrame:
     rows = []

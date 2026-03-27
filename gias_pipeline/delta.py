@@ -12,22 +12,18 @@ If no previous run exists, returns empty delta and logs a warning.
 from __future__ import annotations
 
 import logging
+import pandas as pd
+from .models import SchoolRecord
 from dataclasses import dataclass
 from pathlib import Path
 
-import pandas as pd
-
-from .models import SchoolRecord
-
 logger = logging.getLogger(__name__)
-
 
 @dataclass
 class DeltaResult:
     added: pd.DataFrame       # full records for new URNs
     removed: pd.DataFrame     # rows from previous run for removed URNs
     changed: pd.DataFrame     # rows with old + new url_canonical
-
 
 def _find_previous_csv(output_dir: Path) -> Path | None:
     """Find the most recent schools.csv in output_dir or its subdirectories.
@@ -47,7 +43,6 @@ def _find_previous_csv(output_dir: Path) -> Path | None:
 
     return max(candidates, key=lambda p: p.stat().st_mtime)
 
-
 def _records_to_df(records: list[SchoolRecord]) -> pd.DataFrame:
     rows = [
         {
@@ -58,7 +53,6 @@ def _records_to_df(records: list[SchoolRecord]) -> pd.DataFrame:
         for r in records
     ]
     return pd.DataFrame(rows).set_index("urn")
-
 
 def compute_delta(
     records: list[SchoolRecord],
@@ -91,7 +85,7 @@ def compute_delta(
     prev_path = _find_previous_csv(output_dir)
     if prev_path is None:
         logger.warning(
-            "No previous schools.csv found in %s — first run, generating empty delta files",
+            f"No previous schools.csv found in {output_dir} — first run, generating empty delta files",
             output_dir,
         )
         return DeltaResult(
@@ -100,11 +94,11 @@ def compute_delta(
             changed=empty_changed,
         )
 
-    logger.info("Loading previous run from %s", prev_path)
+    logger.info(f"Loading previous run from {prev_path}")
     try:
         prev_df = pd.read_csv(prev_path, dtype=str, low_memory=False)
-    except Exception as exc:
-        logger.warning("Could not read previous schools.csv: %s — skipping delta", exc)
+    except Exception as e:
+        logger.warning(f"Could not read previous schools.csv: {e} — skipping delta")
         return DeltaResult(
             added=empty_added,
             removed=empty_removed,
@@ -120,7 +114,6 @@ def compute_delta(
         )
 
     prev_df = prev_df.fillna("").set_index("urn")
-
     curr_df = _records_to_df(records)
 
     prev_urns = set(prev_df.index)

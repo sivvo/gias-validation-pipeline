@@ -21,18 +21,12 @@ from gias_pipeline.filter import (
 
 FIXTURES_CSV = Path(__file__).parent.parent / "fixtures" / "test_schools.csv"
 
-
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
-
 def _make_df(rows: list[dict]) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
 def _fixture_df() -> pd.DataFrame:
     return pd.read_csv(FIXTURES_CSV, dtype=str)
-
 
 # ---------------------------------------------------------------------------
 # Unit tests — default scope (all optional groups included, closed excluded)

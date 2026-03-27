@@ -9,15 +9,14 @@ from __future__ import annotations
 import logging
 from typing import Optional
 from urllib.parse import urlparse
-
 from .models import SchoolRecord
 
 logger = logging.getLogger(__name__)
 
 # Confidence bands for email domains (no DNS — purely from URL)
+# TODO think about other TLDs in use - it really is a free for all in the school sector 
 _HIGH_TLDS = frozenset({".sch.uk"})
 _MEDIUM_TLDS = frozenset({".ac.uk", ".org.uk", ".co.uk"})
-
 
 def _apex_from_url(url: Optional[str]) -> Optional[str]:
     """Extract apex domain from a URL string."""
@@ -33,7 +32,6 @@ def _apex_from_url(url: Optional[str]) -> Optional[str]:
         return fqdn[4:] if fqdn.startswith("www.") else fqdn
     except Exception:
         return None
-
 
 def _email_confidence(apex: str) -> str:
     """Return 'high', 'medium', or 'low' based on the apex TLD."""
@@ -75,7 +73,6 @@ def _refine_email_domain(record: SchoolRecord) -> None:
         record.email_domain = None
         record.email_domain_confidence = "low"
 
-
 def enrich(records: list[SchoolRecord]) -> list[SchoolRecord]:
     """Refine email domains for all records (no DNS, no network).
 
@@ -89,7 +86,7 @@ def enrich(records: list[SchoolRecord]) -> list[SchoolRecord]:
     list[SchoolRecord]
         The same list with email_domain and email_domain_confidence updated.
     """
-    logger.info("Step 5: Refining email domains (no DNS)")
+    logger.info("Refining email domains")
     for record in records:
         _refine_email_domain(record)
     logger.info("Email domain refinement complete")

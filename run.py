@@ -3,9 +3,9 @@
 
 Steps:
   1. fetch         — download / load cached GIAS CSV
-  2. filter        — keep open, in-scope schools
+  2. filter        — filter for open, in-scope schools
   3. extract       — classify URLs, build SchoolRecord list
-  4. liveness      — async HTTP reachability check (--skip-liveness to omit)
+  4. liveness      — async HTTP reachability check (--skip-liveness to skip), needed because of DQ issues in GIAS
   5. enrich        — email domain refinement
   6. delta         — compare to previous run
   7. output        — write all output files
@@ -19,10 +19,9 @@ import logging
 import sys
 import time
 import uuid
+import yaml
 from collections import Counter
 from pathlib import Path
-
-import yaml
 
 from gias_pipeline.delta import compute_delta
 from gias_pipeline.enrich import enrich
@@ -33,9 +32,6 @@ from gias_pipeline.liveness import check_liveness
 from gias_pipeline.models import SchoolRecord
 from gias_pipeline.output import write_outputs
 
-# ---------------------------------------------------------------------------
-# Logging
-# ---------------------------------------------------------------------------
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s %(levelname)-8s %(name)s — %(message)s",
@@ -44,11 +40,9 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-
 def _load_config(config_path: str = "config.yaml") -> dict:
     with open(config_path) as fh:
         return yaml.safe_load(fh)
-
 
 def _print_summary(records: list[SchoolRecord], runtime_seconds: float) -> None:
     total = len(records)
@@ -89,7 +83,6 @@ def _print_summary(records: list[SchoolRecord], runtime_seconds: float) -> None:
     print("=" * 60)
     print()
 
-
 def main(config_path: str = "config.yaml", skip_liveness: bool = False) -> None:
     cfg = _load_config(config_path)
     output_dir = Path(cfg["output"]["path"])
@@ -100,12 +93,13 @@ def main(config_path: str = "config.yaml", skip_liveness: bool = False) -> None:
     run_at = datetime.datetime.utcnow()
     wall_start = time.monotonic()
 
-    logger.info("Pipeline run started (run_id=%s)", run_id)
+    logger.info(f"Pipeline run started (run_id={run_id})")
 
     logger.info(f"Fetching GIAS data")
     df = fetch(config_path=config_path)
 
     gias_date = run_at.strftime("%Y%m%d")     # Capture the GIAS file date from the cached filename if possible
+    # this works because GIAS uses a deterministic format for its name
 
     logger.info(f"Applying Filters")
     filter_result = filter_schools(df, scope=cfg.get("scope", {})) # apply filters - configured in config.yaml

@@ -12,28 +12,24 @@ attempted.
 
 from __future__ import annotations
 
-import logging
-import re
-import uuid
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
 from urllib.parse import urlparse
-
-import pandas as pd
-
 from .models import SchoolRecord
 
-logger = logging.getLogger(__name__)
+import logging
+import re
+import uuid
+import pandas as pd
 
-# ---------------------------------------------------------------------------
-# Constants
-# ---------------------------------------------------------------------------
+logger = logging.getLogger(__name__)
 
 _JUNK_PATTERNS: frozenset[str] = frozenset(
     {"n/a", "na", "none", "-", "tbc", "tba", "see above", "see website", ""}
 )
 
+# this is for cases where institutions use a social address... does that EVER happen for a school?
 _SOCIAL_DOMAINS: frozenset[str] = frozenset(
     {
         "facebook.com",
@@ -57,15 +53,10 @@ _COL_LA_NAME = "LA (name)"
 _COL_WEBSITE = "SchoolWebsite"
 _COL_LAST_CHANGED = "LastChangedDate"
 
-
-# ---------------------------------------------------------------------------
-# Pure helpers (no I/O)
-# ---------------------------------------------------------------------------
-
 def _load_domain_list(path: Path) -> frozenset[str]:
     """Return a frozenset of lowercased, stripped domain strings from *path*."""
     if not path.exists():
-        logger.warning("Domain list not found: %s", path)
+        logger.warning(f"Domain list not found: {path}")
         return frozenset()
     lines = path.read_text(encoding="utf-8").splitlines()
     return frozenset(
@@ -74,17 +65,14 @@ def _load_domain_list(path: Path) -> frozenset[str]:
         if line.strip() and not line.startswith("#")
     )
 
-
 def _is_social(domain: str, social_domains: frozenset[str] = _SOCIAL_DOMAINS) -> bool:
     """Return True if *domain* (apex) matches a known social platform."""
     domain = domain.lower()
     return any(domain == s or domain.endswith("." + s) for s in social_domains)
 
-
 def _ends_with_la_domain(domain: str, la_domains: frozenset[str]) -> bool:
     domain = domain.lower()
     return any(domain == la or domain.endswith("." + la) for la in la_domains)
-
 
 def _parse_url(raw: str) -> Optional[tuple[str, str, str]]:
     """Parse *raw* into (fqdn, apex_domain, canonical_url) or return None."""
@@ -103,14 +91,8 @@ def _parse_url(raw: str) -> Optional[tuple[str, str, str]]:
     except Exception:
         return None
 
-
-# ---------------------------------------------------------------------------
-# Intermediate record (phase 1 → phase 2)
-# ---------------------------------------------------------------------------
-
 @dataclass
 class _PartialRecord:
-    # Scalar fields
     urn: str
     name: str
     phase: str
@@ -131,11 +113,6 @@ class _PartialRecord:
     # Email domain (always resolved inline, no DNS)
     email_domain_direct: Optional[str] = None
     email_domain_confidence_direct: str = "low"
-
-
-# ---------------------------------------------------------------------------
-# Phase 1 — classify each row (pure, no I/O)
-# ---------------------------------------------------------------------------
 
 def _classify_row(
     row: pd.Series,
@@ -166,9 +143,6 @@ def _classify_row(
         pipeline_run_id=run_id,
     )
 
-    # ------------------------------------------------------------------
-    # Helper: school goes straight to manual review with a given flag
-    # ------------------------------------------------------------------
     def _manual(flag: str) -> _PartialRecord:
         return _PartialRecord(
             **base,
@@ -194,9 +168,6 @@ def _classify_row(
     if _is_social(apex, social_domains):
         return _manual("social_media_only")
 
-    # ------------------------------------------------------------------
-    # Usable URL from GIAS
-    # ------------------------------------------------------------------
     flags: list[str] = []
 
     if _ends_with_la_domain(apex, la_domains):
@@ -225,9 +196,8 @@ def _classify_row(
         email_domain_confidence_direct=email_domain_confidence_direct,
     )
 
-
 # ---------------------------------------------------------------------------
-# Phase 2 — produce final SchoolRecord from each _PartialRecord
+# produce final SchoolRecord from each _PartialRecord
 # ---------------------------------------------------------------------------
 
 def _finalise(partial: _PartialRecord) -> SchoolRecord:
@@ -253,11 +223,6 @@ def _finalise(partial: _PartialRecord) -> SchoolRecord:
         gias_last_updated=partial.gias_last_updated,
         pipeline_run_id=partial.pipeline_run_id,
     )
-
-
-# ---------------------------------------------------------------------------
-# Public API
-# ---------------------------------------------------------------------------
 
 def extract(
     active: pd.DataFrame,
@@ -287,7 +252,7 @@ def extract(
     social_domains = _SOCIAL_DOMAINS | extra_social
 
     total = len(active)
-    logger.info("Extracting records for %d schools (run_id=%s)", total, run_id)
+    logger.info(f"Extracting records for {total} schools (run_id={run_id})")
     logger.debug(
         "Loaded %d LA domains, %d social domains", len(la_domains), len(social_domains)
     )
@@ -296,7 +261,7 @@ def extract(
     for i, (_, row) in enumerate(active.iterrows()):
         records.append(_finalise(_classify_row(row, la_domains, social_domains, run_id)))
         if (i + 1) % 1000 == 0:
-            logger.info("Processed %d / %d schools...", i + 1, total)
+            logger.info(f"Processed {i + 1}  / {total} schools...")
 
-    logger.info("Extraction complete: %d records", total)
+    logger.info(f"Extraction complete: {total} records", total)
     return records
