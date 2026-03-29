@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 # Confidence bands for email domains (no DNS — purely from URL)
 # TODO think about other TLDs in use - it really is a free for all in the school sector 
 _HIGH_TLDS = frozenset({".sch.uk"})
-_MEDIUM_TLDS = frozenset({".ac.uk", ".org.uk", ".co.uk"})
+_MEDIUM_TLDS = frozenset({".ac.uk", ".org.uk", ".co.uk"}) # ac.uk is as reliable as sch.uk it just doesn't apply much for schools
 
 def _apex_from_url(url: Optional[str]) -> Optional[str]:
     """Extract apex domain from a URL string."""
@@ -48,11 +48,11 @@ def _refine_email_domain(record: SchoolRecord) -> None:
     """Update email_domain and email_domain_confidence on *record* in place.
 
     Rules (no DNS, no network):
-      - url_canonical apex ends in .sch.uk              → high
-      - url_canonical apex ends in .ac.uk/.org.uk/.co.uk → medium
-      - url_canonical apex (any other TLD)              → low
-      - is_reachable=False, url_original has apex       → low + email_domain_unverified
-      - no URL at all                                   → email_domain = None
+      - url_canonical apex ends in .sch.uk              -> high
+      - url_canonical apex ends in .ac.uk/.org.uk/.co.uk -> medium
+      - url_canonical apex (any other TLD)              -> low
+      - is_reachable=False, url_original has apex       -> low + email_domain_unverified
+      - no URL at all                                   -> email_domain = None
     """
     canonical_apex = _apex_from_url(record.url_canonical)
 

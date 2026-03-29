@@ -36,7 +36,7 @@ def _cached_path(cache_dir: Path, d: date) -> Path:
 def _download(url: str, dest: Path) -> None:
     """Stream-download *url* to *dest*, writing atomically via a temp file."""
     tmp = dest.with_suffix(".tmp")
-    logger.info("Downloading %s → %s", url, dest)
+    logger.info("Downloading %s -> %s", url, dest)
     with requests.get(url, stream=True, timeout=60) as resp:
         resp.raise_for_status()
         with open(tmp, "wb") as fh:
