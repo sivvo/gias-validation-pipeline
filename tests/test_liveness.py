@@ -1,4 +1,6 @@
-"""Tests for gias_pipeline.liveness."""
+"""Tests for gias_pipeline.liveness.
+auto generated
+"""
 
 from __future__ import annotations
 
