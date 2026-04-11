@@ -11,7 +11,6 @@ attempted.
 """
 
 from __future__ import annotations
-
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
@@ -54,7 +53,7 @@ _COL_WEBSITE = "SchoolWebsite"
 _COL_LAST_CHANGED = "LastChangedDate"
 
 def _load_domain_list(path: Path) -> frozenset[str]:
-    """Return a frozenset of lowercased, stripped domain strings from *path*."""
+    """Return a frozenset of lowercased, stripped domain strings from path"""
     if not path.exists():
         logger.warning(f"Domain list not found: {path}")
         return frozenset()
@@ -66,7 +65,7 @@ def _load_domain_list(path: Path) -> frozenset[str]:
     )
 
 def _is_social(domain: str, social_domains: frozenset[str] = _SOCIAL_DOMAINS) -> bool:
-    """Return True if *domain* (apex) matches a known social platform."""
+    """Return True if domain (apex) matches a known social platform"""
     domain = domain.lower()
     return any(domain == s or domain.endswith("." + s) for s in social_domains)
 
@@ -75,7 +74,7 @@ def _ends_with_la_domain(domain: str, la_domains: frozenset[str]) -> bool:
     return any(domain == la or domain.endswith("." + la) for la in la_domains)
 
 def _parse_url(raw: str) -> Optional[tuple[str, str, str]]:
-    """Parse *raw* into (fqdn, apex_domain, canonical_url) or return None."""
+    """Parse raw into (fqdn, apex_domain, canonical_url) or return None"""
     raw = raw.strip()
     if "://" not in raw:
         raw = "https://" + raw
@@ -120,7 +119,7 @@ def _classify_row(
     social_domains: frozenset[str],
     run_id: str,
 ) -> _PartialRecord:
-    """Build a _PartialRecord from one GIAS row. No DNS calls."""
+    """Build a _PartialRecord from one GIAS row. No DNS calls"""
 
     def col(name: str) -> str:
         val = row.get(name, "")
@@ -229,16 +228,16 @@ def extract(
     data_dir: Path = Path("./data"),
     run_id: Optional[str] = None,
 ) -> list[SchoolRecord]:
-    """Extract a SchoolRecord for every row in *active*.
+    """Extract a SchoolRecord for every row in active
 
     Parameters
     ----------
     active:
-        Filtered DataFrame from :func:`filter.filter_schools`.
+        Filtered DataFrame from filter.filter_schools
     data_dir:
-        Directory containing ``la_domains.txt`` and ``social_domains.txt``.
+        Directory containing la_domains.txt and social_domains.txt
     run_id:
-        Unique identifier for this pipeline run. Auto-generated if not given.
+        Unique identifier for this pipeline run. Auto-generated if not given
 
     Returns
     -------

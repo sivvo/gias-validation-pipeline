@@ -115,12 +115,10 @@ def write_outputs(
 
     df = _records_to_df(records)
 
-    # --- schools.csv ---
     schools_path = output_dir / "schools.csv"
     df.to_csv(schools_path, index=False)
     logger.info("Wrote %s (%d rows)", schools_path, len(df))
 
-    # --- email_domains.txt ---
     email_domains = sorted(
         {r.email_domain for r in records if r.email_domain}
     )
@@ -128,7 +126,6 @@ def write_outputs(
     email_path.write_text("\n".join(email_domains) + "\n", encoding="utf-8")
     logger.info("Wrote %s (%d domains)", email_path, len(email_domains))
 
-    # --- urls_canonical.txt ---
     canonical_urls = sorted(
         {r.url_canonical for r in records if r.is_reachable is True and r.url_canonical}
     )
@@ -136,7 +133,6 @@ def write_outputs(
     canonical_path.write_text("\n".join(canonical_urls) + "\n", encoding="utf-8")
     logger.info("Wrote %s (%d URLs)", canonical_path, len(canonical_urls))
 
-    # --- urls_original.txt ---
     original_urls = sorted(
         {r.url_original for r in records if r.url_original}
     )
@@ -144,13 +140,11 @@ def write_outputs(
     original_path.write_text("\n".join(original_urls) + "\n", encoding="utf-8")
     logger.info("Wrote %s (%d URLs)", original_path, len(original_urls))
 
-    # --- unreachable.csv ---
     unreachable_df = df[df["is_reachable"] == "False"]
     unreachable_path = output_dir / "unreachable.csv"
     unreachable_df.to_csv(unreachable_path, index=False)
     logger.info("Wrote %s (%d rows)", unreachable_path, len(unreachable_df))
 
-    # --- manual_review.csv ---
     manual_mask = df["flags"].apply(
         lambda f: _has_any_flag(f, _MANUAL_FLAGS)
     )
@@ -159,14 +153,12 @@ def write_outputs(
     manual_df.to_csv(manual_path, index=False)
     logger.info("Wrote %s (%d rows)", manual_path, len(manual_df))
 
-    # --- la_hosted.csv ---
     la_mask = df["flags"].apply(lambda f: _has_flag(f, "la_hosted"))
     la_df = df[la_mask]
     la_path = output_dir / "la_hosted.csv"
     la_df.to_csv(la_path, index=False)
     logger.info("Wrote %s (%d rows)", la_path, len(la_df))
 
-    # --- delta files ---
     delta_added_path = output_dir / "delta_added.csv"
     delta.added.to_csv(delta_added_path, index=False)
     logger.info("Wrote %s (%d rows)", delta_added_path, len(delta.added))
@@ -179,7 +171,6 @@ def write_outputs(
     delta.changed.to_csv(delta_changed_path, index=False)
     logger.info("Wrote %s (%d rows)", delta_changed_path, len(delta.changed))
 
-    # --- run_summary.json ---
     flag_counts: Counter[str] = Counter(f for r in records for f in r.flags)
     confidence_counts: Counter[str] = Counter(r.url_confidence for r in records)
 

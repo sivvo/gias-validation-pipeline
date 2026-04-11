@@ -5,11 +5,10 @@ Derives email_domain from url_canonical (post-liveness) or url_original
 """
 
 from __future__ import annotations
-
-import logging
 from typing import Optional
 from urllib.parse import urlparse
 from .models import SchoolRecord
+import logging
 
 logger = logging.getLogger(__name__)
 
@@ -34,7 +33,7 @@ def _apex_from_url(url: Optional[str]) -> Optional[str]:
         return None
 
 def _email_confidence(apex: str) -> str:
-    """Return 'high', 'medium', or 'low' based on the apex TLD."""
+    """ high, medium, or low based on the apex TLD."""
     for tld in _HIGH_TLDS:
         if apex.endswith(tld):
             return "high"

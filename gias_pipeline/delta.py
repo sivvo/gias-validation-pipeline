@@ -10,12 +10,11 @@ If no previous run exists, returns empty delta and logs a warning.
 """
 
 from __future__ import annotations
-
-import logging
-import pandas as pd
 from .models import SchoolRecord
 from dataclasses import dataclass
 from pathlib import Path
+import logging
+import pandas as pd
 
 logger = logging.getLogger(__name__)
 
@@ -58,19 +57,19 @@ def compute_delta(
     records: list[SchoolRecord],
     output_dir: Path,
 ) -> DeltaResult:
-    """Compare *records* to the previous run's schools.csv.
+    """Compare records to the previous run schools.csv
 
     Parameters
     ----------
     records:
-        Current run's SchoolRecord list.
+        Current run's SchoolRecord list
     output_dir:
-        Directory to search for previous schools.csv.
+        Directory to search for previous schools.csv
 
     Returns
     -------
     DeltaResult
-        DataFrames for added, removed, and changed records.
+        DataFrames for added, removed, and changed records
     """
     empty_added = pd.DataFrame(
         columns=["urn", "name", "url_canonical"]

@@ -10,13 +10,12 @@ Schools without url_original (domain_missing, social_media_only) are skipped.
 """
 
 from __future__ import annotations
-
+from typing import Optional
+from .models import SchoolRecord
 import asyncio
 import logging
 import aiohttp
 import yaml
-from typing import Optional
-from .models import SchoolRecord
 
 logger = logging.getLogger(__name__)
 

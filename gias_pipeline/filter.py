@@ -17,10 +17,8 @@ Because I wasn't sure at time of writing, i've made these all be config configur
 """
 
 from __future__ import annotations
-
-import logging
 from typing import NamedTuple
-
+import logging
 import pandas as pd
 
 logger = logging.getLogger(__name__)
@@ -119,16 +117,16 @@ def filter_schools(df: pd.DataFrame, scope: dict | None = None) -> FilterResult:
     Parameters
     ----------
     df:
-        Raw GIAS DataFrame as returned by :func:`fetch.fetch`.
+        Raw GIAS DataFrame as returned by :func:fetch.fetch.
     scope:
-        Dict of scope flags (from ``config.yaml``'s ``scope`` section).
-        Missing keys fall back to :data:`_SCOPE_DEFAULTS`.
+        Dict of scope flags (from config.yaml's scope section).
+        Missing keys fall back to :data:_SCOPE_DEFAULTS.
 
     Returns
     -------
     FilterResult
-        ``active`` contains establishments matching the scope.
-        ``excluded`` retains all other rows for reference / audit.
+        active contains establishments matching the scope.
+        excluded retains all other rows for reference / audit.
     """
     if _COL_TYPE not in df.columns:
         raise ValueError(

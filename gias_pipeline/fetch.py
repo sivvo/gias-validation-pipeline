@@ -24,14 +24,12 @@ def _load_config(config_path: str = "config.yaml") -> dict:
     with open(config_path) as fh:
         return yaml.safe_load(fh)
 
-
 def _url_for_date(template: str, d: date) -> str:
     return template.format(date=d.strftime("%Y%m%d"))
 
 
 def _cached_path(cache_dir: Path, d: date) -> Path:
     return cache_dir / f"edubasealldata_{d.strftime('%Y%m%d')}.csv"
-
 
 def _download(url: str, dest: Path) -> None:
     """Stream-download *url* to *dest*, writing atomically via a temp file."""
@@ -55,7 +53,7 @@ def fetch(config_path: str = "config.yaml") -> pd.DataFrame:
     Parameters
     ----------
     config_path:
-        Path to ``config.yaml``.
+        Path to config.yaml
 
     Returns
     -------
