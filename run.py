@@ -91,7 +91,7 @@ def main(config_path: str = "config.yaml", skip_liveness: bool = False) -> None:
     data_dir = Path("./data")
 
     run_id = str(uuid.uuid4())
-    run_at = datetime.datetime.utcnow()
+    run_at = datetime.datetime.now(datetime.UTC)
     wall_start = time.monotonic()
 
     logger.info(f"Pipeline run started (run_id={run_id})")

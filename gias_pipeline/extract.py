@@ -262,5 +262,5 @@ def extract(
         if (i + 1) % 1000 == 0:
             logger.info(f"Processed {i + 1}  / {total} schools...")
 
-    logger.info(f"Extraction complete: {total} records", total)
+    logger.info("Extraction complete: %d records", total)
     return records
