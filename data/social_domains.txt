@@ -1,0 +1,9 @@
+# Additional social / hosting platforms to flag
+# These supplement the hardcoded list in extract.py
+myschoolapp.com
+schoolwebsite.net
+primarysite.net
+weebly.com
+wix.com
+wordpress.com
+blogspot.com
