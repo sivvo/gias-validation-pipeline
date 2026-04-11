@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """GIAS Pipeline — full pipeline entry point.
+The plan here is to pull data from GIAS, process it, and then feed it into an EASM
 
 Steps:
   1. fetch         — download / load cached GIAS CSV

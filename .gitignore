@@ -17,3 +17,4 @@ output/
 .idea/
 *.swp
 .claude
+.DS_Store
